@@ -12,6 +12,7 @@
 class User < ActiveRecord::Base
 	attr_accessible :name, :email, :password, :password_confirmation
 	has_secure_password
+	before_save :create_remember_token	#callback method to create the remember token
 
 	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 
@@ -22,4 +23,8 @@ class User < ActiveRecord::Base
 	validates :password, length: { minimum: 6 }
 	validates :password_confirmation, presence: true
 
+	private			# Not to expose to outside users
+	  	def create_remember_token
+	    	self.remember_token = SecureRandom.urlsafe_base64	#returns a random string of length 16 composed of the characters A–Z, a–z, 0–9, “-”, and “_” (for a total of 64 possibilities)
+	  	end														#means that the probability of two remember tokens being the same is 1/64^(16)=2^(-96)≈10^(−29), which is negligible.
 end
