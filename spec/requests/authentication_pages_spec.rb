@@ -43,6 +43,12 @@ describe "Authentication" do
     end
   end
 
+  describe "user isn't signed in" do
+    it { should_not have_link('Profile') }
+    it { should_not have_link('Settings') }
+  end
+
+
   describe "authorization" do
 
     describe "for non-signed-in users" do
@@ -80,6 +86,23 @@ describe "Authentication" do
           end
         end
       end
+
+      describe "in the Microposts controller" do
+
+        describe "submitting to the create action" do
+          before { post microposts_path }
+          specify { response.should redirect_to(signin_path) }
+        end
+
+        describe "submitting to the destroy action" do
+          before do
+            micropost = FactoryGirl.create(:micropost)
+            delete micropost_path(micropost)
+          end
+          specify { response.should redirect_to(signin_path) }
+        end
+      end
+      
     end
 
     describe "as wrong user" do
